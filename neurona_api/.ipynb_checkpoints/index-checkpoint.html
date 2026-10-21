@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Neurona M-P</title>
+  <style>
+    body { font-family: sans-serif; max-width: 28rem; margin: 2rem auto; }
+    label { display: block; margin: 0.6rem 0; }
+    button { margin-top: 0.8rem; }
+    #salida { font-size: 1.2rem; }
+  </style>
+</head>
+<body>
+  <h1>Neurona M-P</h1>
+  <p>Cada entrada es 0 o 1. La neurona responde True si la suma llega al umbral.</p>
+
+  <form id="form">
+    <label>x1 <input name="x1" type="number" min="0" max="1" value="1" required></label>
+    <label>x2 <input name="x2" type="number" min="0" max="1" value="0" required></label>
+    <label>x3 <input name="x3" type="number" min="0" max="1" value="1" required></label>
+    <label>x4 <input name="x4" type="number" min="0" max="1" value="0" required></label>
+    <label>umbral <input name="umbral" type="number" min="0" max="4" value="2" required></label>
+    <button>Predecir</button>
+  </form>
+
+  <p id="salida"></p>
+
+  <script>
+    const form = document.getElementById("form")
+    const salida = document.getElementById("salida")
+
+    form.onsubmit = async (e) => {
+      e.preventDefault()
+      const f = new FormData(form)
+      const cuerpo = {
+        x1: Number(f.get("x1")),
+        x2: Number(f.get("x2")),
+        x3: Number(f.get("x3")),
+        x4: Number(f.get("x4")),
+        umbral: Number(f.get("umbral"))
+      }
+
+      const resp = await fetch("/predecir", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cuerpo)
+      })
+      const data = await resp.json()
+
+      if (!resp.ok) {
+        salida.textContent = "Revisa los valores: cada x es 0 o 1 y el umbral va de 0 a 4."
+        return
+      }
+
+      salida.textContent = "Suma " + data.suma + " → " + data.prediccion
+    }
+  </script>
+</body>
+</html>
